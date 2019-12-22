@@ -2,7 +2,6 @@
 
 from flask import Flask
 import controller
-import html
 
 SECRETS_DIR = '/opt/highsaltlevels/etc/'
 app = Flask(__name__)
@@ -10,6 +9,10 @@ app = Flask(__name__)
 @app.route('/health')
 def health_check():
     return {'health': 'ok'}
+
+@app.route('/favicon.ico')
+def get_fav_icon():
+    return '/opt/highsaltlevels/etc/highsaltlevels.ico'
 
 @app.route('/ips')
 def ips():

@@ -17,15 +17,13 @@ logger = logging.getLogger('UPDATER')
 def get_ips():
     ips = []
     for network, netmask, _, iface, address, _ in scapy.config.conf.route.routes:
-        logger.info('network={} address={}'.format(network, address))
         if not network_tools.skip_interface(network, netmask, iface, address):
             try:
                 network = network_tools.to_CIDR_notation(network, netmask)
-                logger.info('network={} netmask={}'.format(network, netmask))
-                ans, unans = scapy.layers.l2.arping(network, iface=iface, timeout=5)
-                for _, r in ans.res:
-                    #line = r.sprintf('%ARP.psrc%')
-                    ips.append(r.psrc)
+                if not network.startswith('169'):
+                    ans, unans = scapy.layers.l2.arping(network, iface=iface, timeout=5)
+                    for _, r in ans.res:
+                        ips.append(r.psrc)
             except socket.error as error:
                 if error.errno == errno.EPERM:
                     logger.error('Operation not permitted')
@@ -33,4 +31,5 @@ def get_ips():
             except Exception as error:
                 raise exceptions.GetHostnamesException('Unexpected Error: {}'.format(error))
         sleep(0.1)
+    logger.info('Found IP addresses: {}'.format(ips))
     return ips
