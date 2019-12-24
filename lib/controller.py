@@ -1,4 +1,3 @@
-import logging
 from time import sleep
 import socket
 import scapy.config
@@ -7,11 +6,7 @@ import scapy.route
 import errno
 import exceptions
 import network_tools
-
-MAX_PING_TIMEOUT=5 # seconds
-logging.basicConfig(format='%(asctime)s %(levelname)-5s %(message)s', datefmt='%Y-%m-%d %H:%M:%S',
-                    level=logging.DEBUG)
-logger = logging.getLogger('UPDATER')
+from log import LOGGER
 
 # This code was taken from https://github.com/bwaldvogel/neighbourhood/blob/master/neighbourhood.py
 def get_ips():
@@ -26,10 +21,14 @@ def get_ips():
                         ips.append(r.psrc)
             except socket.error as error:
                 if error.errno == errno.EPERM:
-                    logger.error('Operation not permitted')
+                    LOGGER.error('Operation not permitted')
                     raise exceptions.OperationNotPermittedException(error)
             except Exception as error:
                 raise exceptions.GetHostnamesException('Unexpected Error: {}'.format(error))
         sleep(0.1)
-    logger.info('Found IP addresses: {}'.format(ips))
+    ips.sort()
+    LOGGER.info('Found IP addresses: {}'.format(ips))
     return ips
+
+def update_pc(ip):
+    pass
