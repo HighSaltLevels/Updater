@@ -3,6 +3,7 @@
 from flask import Flask
 from flask import request
 from exceptions import BadIPListException
+from log import LOGGER
 import controller
 import html_utils
 
@@ -36,7 +37,7 @@ def update():
     try:
         ip_dict = html_utils.load_json_from_disk()
     except BadIPListException as error:
-        print('Error: {}'.format(error))
+        LOGGER.error('Error: {}'.format(error))
         return {'message': str(error)}, 500
 
     ip = ip_dict[request.form['ip_select']]

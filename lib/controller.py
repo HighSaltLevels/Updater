@@ -1,4 +1,6 @@
 from time import sleep
+import io
+from contextlib import redirect_stdout
 import socket
 import scapy.config
 import scapy.layers.l2
@@ -11,14 +13,17 @@ from log import LOGGER
 # This code was taken from https://github.com/bwaldvogel/neighbourhood/blob/master/neighbourhood.py
 def get_ips():
     ips = []
+    LOGGER.debug('Sending an ARP to get a list of IP addresses')
     for network, netmask, _, iface, address, _ in scapy.config.conf.route.routes:
         if not network_tools.skip_interface(network, netmask, iface, address):
             try:
-                network = network_tools.to_CIDR_notation(network, netmask)
-                if not network.startswith('169'):
-                    ans, unans = scapy.layers.l2.arping(network, iface=iface, timeout=5)
-                    for _, r in ans.res:
-                        ips.append(r.psrc)
+                suppress_output = io.StringIO()
+                with redirect_stdout(suppress_output):
+                    network = network_tools.to_CIDR_notation(network, netmask)
+                    if not network.startswith('169'):
+                        ans, unans = scapy.layers.l2.arping(network, iface=iface, timeout=5)
+                        for _, r in ans.res:
+                            ips.append(r.psrc)
             except socket.error as error:
                 if error.errno == errno.EPERM:
                     LOGGER.error('Operation not permitted')
