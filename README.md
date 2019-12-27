@@ -33,4 +33,5 @@ docker run -it --network=host -p 7777:7777 updater
 
 ### TODOs
  - I plan to add a docker-compose file to allow an easier run of the docker image
- - I plan to add html pages so it will be much more browser friendly
+ - ~~I plan to add html pages so it will be much more browser friendly~~ Done :)
+ - I plan to add the option to prune the IP Addresses to only Linux Operating Systems
